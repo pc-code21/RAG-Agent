@@ -1,0 +1,239 @@
+{
+  "name": "RAG Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -624,
+        -176
+      ],
+      "id": "d6fae3cc-a1f8-45c1-b53b-dec72c042491",
+      "name": "When chat message received",
+      "webhookId": "a16ec4ad-efca-4103-9c9a-fd130c024a63"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "you are a tutor who helps in study . answer only from the document you have, if something is not in document then clearly answer \"do not have sufficient information\"."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -352,
+        -176
+      ],
+      "id": "9db757ba-f7bc-4e09-9f2b-9ba1ba1d5397",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        48
+      ],
+      "id": "99fa121d-8d83-40c6-9abc-b6d428949c17",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "answer the questions asked by the user. answer in a way that it helps student to get 95% in exams."
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        48
+      ],
+      "id": "0121e18e-24ef-47c5-9bc9-1fb230f239b0",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8nragagent2",
+          "mode": "list",
+          "cachedResultName": "n8nragagent2"
+        },
+        "options": {
+          "pineconeNamespace": "ragn8n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        256
+      ],
+      "id": "d32079f9-efce-4f9f-a176-bd674d87a31f",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "dKjF3qUpLNsMA9bh",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-2"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        464
+      ],
+      "id": "1d498a7d-bc8b-494d-b9be-fbdc9b3c5030",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vxcIn9QSj2F141Tv",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "minimax/minimax-m3:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        48
+      ],
+      "id": "1bfa517c-234e-4876-862e-263819d2fa99",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "9krtBlTHkWRVqykY",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "minimax/minimax-m3:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        48,
+        256
+      ],
+      "id": "8887aa29-8edf-4480-99c5-4777cae65438",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "9krtBlTHkWRVqykY",
+          "name": "OpenRouter account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "d6c70800-72bf-4431-af88-fe24d38d97e6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "facd81ed9a5c411014f61f7252536617bdf2e756ba71d3a1b531973872aa29e5"
+  },
+  "id": "fEQ0kWouI0Jpwal3",
+  "tags": []
+}
